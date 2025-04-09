@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 //import { useNavigate } from "react-router-dom";
 import "./PaymentForm.css"; // Import custom CSS
 import "./Receipt.css";
@@ -35,10 +35,52 @@ const PaymentForm = () => {
 
   const [canValidate, setCanValidate] = useState(true);
   const [step, setStep] = useState(1);
-  const [xrate, ] = useState(1500);
+  const [xrate] = useState(1500);
+  // State to track errors
+  const getToken = () => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+      return token;
+    } else {
+      console.error("Token not found");
+      return null;
+    } 
+  }
+  const Sign = () => {
+    const url = import.meta.env.VITE_API_VAS + "/signin";
+    const username = import.meta.env.VITE_API_VAS_USERNAME;
+    const password = import.meta.env.VITE_API_VAS_PASSWORD;
+  
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: `${username}`, password:`${password}`}),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Login failed');
+        }
+        return response.text(); // 👈 retrieve JWT as plain text
+      })
+      .then(token => {
+        console.log('JWT:', token);
+        // You can now store it, e.g. in localStorage:
+        localStorage.setItem('jwt', token);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    
+  };
   // State to track errors
   const [error, setError] = useState(null);
-  const api = import.meta.env.VITE_API_URL;
+  useEffect(() => {
+    Sign();
+  }, []); // empty array = runs only once (on mount)
+
+  const api = import.meta.env.VITE_API_VAS;
   const biller = {
     Electricity: "ELECTRIC_DISCO",
     PayTv: "PAY_TV",
@@ -101,26 +143,26 @@ const PaymentForm = () => {
     amount &&
     email;
 
-    function generateOrderID(): string {
-      // Get the current date and format it as YYMMddHHmmss
-      const now = new Date();
-      const formattedDate = now
-        .toISOString()
-        .slice(2, 19) // Extract YY-MM-DDTHH:mm:ss
-        .replace(/[-T:]/g, ""); // Remove separators to get YYMMddHHmmss
-    
-      // Generate a 6-digit random number
-      const randomSixDigits = Math.floor(100000 + Math.random() * 900000); // Ensures a 6-digit number
-    
-      // Combine the formatted date and random number
-      return `${formattedDate}${randomSixDigits}`;
+  function generateOrderID(): string {
+    // Get the current date and format it as YYMMddHHmmss
+    const now = new Date();
+    const formattedDate = now
+      .toISOString()
+      .slice(2, 19) // Extract YY-MM-DDTHH:mm:ss
+      .replace(/[-T:]/g, ""); // Remove separators to get YYMMddHHmmss
+
+    // Generate a 6-digit random number
+    const randomSixDigits = Math.floor(100000 + Math.random() * 900000); // Ensures a 6-digit number
+
+    // Combine the formatted date and random number
+    return `${formattedDate}${randomSixDigits}`;
+  }
+  const cleanString = (input: string): any => {
+    if (input.includes("_")) {
+      return input.split("_")[1]; // Split the string by "_" and return the second part
     }
-    const cleanString = (input: string): any => {
-      if (input.includes("_")) {
-        return input.split("_")[1]; // Split the string by "_" and return the second part
-      }
-      return null; // Return null if "_" is not found
-    };
+    return null; // Return null if "_" is not found
+  };
   const formatCurrency = (
     amount: number,
     currency: string = "USD",
@@ -148,6 +190,7 @@ const PaymentForm = () => {
     total: amount,
     value: xamount,
   };
+
   const handleIconClick = async (service: string) => {
     const selectedServiceIcon =
       serviceIcons.find((item) => item.name === service)?.icon || "";
@@ -166,24 +209,23 @@ const PaymentForm = () => {
     setXamount(0);
     setAccountName("");
     console.log(`Selected service: ${service}`);
-    const TOKEN =
-      "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKV1QiLCJqdGkiOiIxIiwiaXNzIjoiQmxhY2tTaWxpY29uIiwiaWF0IjoxNzQyOTUwMzgxLCJleHAiOjE3NDM1NTUxODF9.9RvhQjuJpF1QEIgLc60XanIwiMaBKlL0f10MvSwWk8penbKu2a5PgQi2WAYbUuCgAF3f7lUML3QKzSN4CdWg7A";
     console.log(biller);
     const billerCode = biller[service as keyof typeof biller];
     console.log(billerCode);
+
     if (!billerCode) return;
     if (service === "Topup") {
       setCanValidate(false);
     }
     setIsLoading(true);
-    const apiUrl = `http://localhost:8080/AutoPay/app/api/v1/vas/category/drill/${billerCode}`;
+    const apiUrl = `${api}/category/drill/${billerCode}`;
     console.log(apiUrl);
     // Fetch data from API
     fetch(apiUrl, {
       method: "GET", // HTTP method
       headers: {
         "Content-Type": "application/json", // Specify the content type
-        Authorization: `Bearer ${TOKEN}`, // Add Authorization header with the token
+        Authorization: `Bearer ${getToken()}`, // Add Authorization header with the token
       },
     })
       .then((response) => {
@@ -221,8 +263,8 @@ const PaymentForm = () => {
   const handleProductChange = (selected: any) => {
     setProduct(selected.value);
     setError(null);
-    console.log("Selected Len:", selected.accountlen);
-    console.log("Selected amount:", selected.amount);
+   // console.log("Selected Len:", selected.accountlen);
+   // console.log("Selected amount:", selected.amount);
     setPreAmount(false);
     if (Number(selected.amount) > 0) {
       //setAmount((parseFloat(selected.amount)/xrate). toFixed(2));
@@ -236,10 +278,7 @@ const PaymentForm = () => {
     setSelectedBiller(selected.value);
     //setProduct("");
     setError(null);
-
-    const TOKEN =
-      "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKV1QiLCJqdGkiOiIxIiwiaXNzIjoiQmxhY2tTaWxpY29uIiwiaWF0IjoxNzQyOTUwMzgxLCJleHAiOjE3NDM1NTUxODF9.9RvhQjuJpF1QEIgLc60XanIwiMaBKlL0f10MvSwWk8penbKu2a5PgQi2WAYbUuCgAF3f7lUML3QKzSN4CdWg7A";
-    //if (!selectedBiller) return;
+   //if (!selectedBiller) return;
     setProductLoading(true);
     console.log(selectedBiller);
     const apiUrl = `${api}/biller/${selected.value}/product`;
@@ -249,7 +288,7 @@ const PaymentForm = () => {
       method: "GET", // HTTP method
       headers: {
         "Content-Type": "application/json", // Specify the content type
-        Authorization: `Bearer ${TOKEN}`, // Add Authorization header with the token
+        Authorization: `Bearer ${getToken()}`, // Add Authorization header with the token
       },
     })
       .then((response) => {
@@ -297,8 +336,6 @@ const PaymentForm = () => {
       setAccountName("N/A");
       return true;
     }
-    const TOKEN =
-      "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJKV1QiLCJqdGkiOiIxIiwiaXNzIjoiQmxhY2tTaWxpY29uIiwiaWF0IjoxNzQyOTUwMzgxLCJleHAiOjE3NDM1NTUxODF9.9RvhQjuJpF1QEIgLc60XanIwiMaBKlL0f10MvSwWk8penbKu2a5PgQi2WAYbUuCgAF3f7lUML3QKzSN4CdWg7A";
     const apiUrl = `${api}/customer/query`;
 
     try {
@@ -306,7 +343,7 @@ const PaymentForm = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
+          Authorization: `Bearer ${getToken()}`,
         },
         body: JSON.stringify({
           account: accountNumber,
@@ -336,7 +373,7 @@ const PaymentForm = () => {
 
     return validated;
   }
- 
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -484,19 +521,25 @@ const PaymentForm = () => {
                   <CheckCircle className="confirmation-icon" />
                   <h1>Order Summary!</h1>
                 </div>
-               
+
                 <div className="payment-details">
                   <p>Order ID: {order.id}</p>
                   <p>Date: {order.date}</p>
-                  <p>Total: {formatCurrency(Number(order.total),"USD","en-US")}</p>
-                  <h3><b>Customer Information:</b></h3>
+                  <p>
+                    Total: {formatCurrency(Number(order.total), "USD", "en-US")}
+                  </p>
+                  <h3>
+                    <b>Customer Information:</b>
+                  </h3>
                   <p>Name: {order.customer.name}</p>
                   <p>Account: {order.customer.account}</p>
                   <p>Contact: {order.customer.contact}</p>
-                  <h3><b>Product Details:</b></h3>
+                  <h3>
+                    <b>Product Details:</b>
+                  </h3>
                   <p>Provider: {selectedBiller}</p>
                   <p>Product: {order.product.productName}</p>
-                  <p>value: {formatCurrency(order.value,"NGN","en-NG")}</p>
+                  <p>value: {formatCurrency(order.value, "NGN", "en-NG")}</p>
                 </div>
               </div>
             </>
