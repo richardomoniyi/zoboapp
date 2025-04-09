@@ -26,17 +26,16 @@ const PaymentForm = () => {
   const [amount, setAmount] = useState("");
   const [xamount, setXamount] = useState(0);
   const [email, setEmail] = useState("");
-  const [proceed, setProceed] = useState(false);
   const [accountName, setAccountName] = useState("");
-  const [accountLen, setAccountLen] = useState("");
+  const [, setAccountLen] = useState("");
   // State to track loading
   const [isLoading, setIsLoading] = useState(false);
   const [isAccount, setIsAccount] = useState(false);
   const [preAmount, setPreAmount] = useState(false);
-  const [canPay, setCanPay] = useState(false);
+
   const [canValidate, setCanValidate] = useState(true);
   const [step, setStep] = useState(1);
-  const [xrate, setXrate] = useState(1500);
+  const [xrate, ] = useState(1500);
   // State to track errors
   const [error, setError] = useState(null);
   const api = import.meta.env.VITE_API_URL;
