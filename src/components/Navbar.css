@@ -1,0 +1,137 @@
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    /*background-color: #333;*/
+    background-color: rgba(255, 255, 255, .3);
+    color: black;
+    position: relative;
+    margin-bottom: 20px; /* Add bottom margin */
+  }
+  
+  /* Logo */
+  .navbar-logo {
+    font-size: 36px;
+    font-weight: bold;
+    color: whitesmoke;
+  }
+  .navbar-blue-logo {
+    font-size: 36px;
+    font-weight: bold;
+    color: #2563eb;
+  }
+  
+  /* Right-aligned Menu for larger screens */
+  .navbar-right {
+    display: flex;
+    align-items: center;
+  }
+  
+  .sign-in-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .sign-in-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .user-dropdown {
+    position: relative;
+  }
+  
+  .dropdown-toggle {
+    background-color: transparent;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .dropdown-toggle:hover {
+    color: #007bff;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 150px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .dropdown-menu a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .dropdown-menu a:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Mobile Menu */
+  .mobile-menu-icon {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 10px;
+    background-color: transparent;
+  }
+  
+  .mobile-menu-icon .bar {
+    width: 25px;
+    height: 4px;
+    margin: 4px 0;
+    background-color: white;
+  }
+  
+  /* Mobile menu visibility */
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #333;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .mobile-menu.active {
+    display: flex;
+  }
+  
+  .mobile-menu a {
+    padding: 15px;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .mobile-menu a:hover {
+    background-color: #007bff;
+  }
+  
+  /* Mobile specific: Hide navbar items and show hamburger */
+  @media (max-width: 768px) {
+    .navbar-right {
+      display: none;
+    }
+  
+    .mobile-menu-icon {
+      display: flex;
+    }
+  }
+  

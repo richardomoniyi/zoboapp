@@ -1,0 +1,53 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 200 50"
+  width="200"
+  height="50"
+>
+  <!-- Letter Z -->
+  <text
+    x="10"
+    y="40"
+    font-family="Arial, sans-serif"
+    font-size="40"
+    fill="#FF5733" 
+    font-weight="bold">
+    Z
+  </text>
+
+  <!-- Letter O -->
+  <text
+    x="50"
+    y="40"
+    font-family="Arial, sans-serif"
+    font-size="40"
+    fill="#33FF57" 
+    font-weight="bold"
+  >
+    o
+  </text>
+
+  <!-- Letter B -->
+  <text
+    x="90"
+    y="40"
+    font-family="Arial, sans-serif"
+    font-size="40"
+    fill="#3357FF"
+    font-weight="bold"
+  >
+    b
+  </text>
+
+  <!-- Letter O -->
+  <text
+    x="130"
+    y="40"
+    font-family="Arial, sans-serif"
+    font-size="40"
+    fill="#FF33A1" 
+    font-weight="bold"
+  >
+    o
+  </text>
+</svg>
